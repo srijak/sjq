@@ -1,0 +1,4 @@
+Just in memory for now.
+Create a uniqueue datastructure.
+Create protocol
+Hook them up
