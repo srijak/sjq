@@ -6,7 +6,7 @@ import scala.collection.mutable.HashSet
 class InMemoryQueue[A] {
   var availableJobs = new Uniqueue[A]()
 
-  def put(item: A): Unit = {
+  def put(item: A): Int = {
     availableJobs.synchronized {
       availableJobs.enqueue(item)
     }

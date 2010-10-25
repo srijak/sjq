@@ -34,8 +34,7 @@ class SjqHandler(val session: IoSession) extends Actor {
   private def handle(request: Request) = {
     request match {
       case PUT(q, data) =>
-        put(q, data)
-        sendOk
+        sendReply(put(q, data).toString)
       case GET(q) =>
         sendReply(get(q).getOrElse(""))
       case CPUT(q, callback_url, data) =>
