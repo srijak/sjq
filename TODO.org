@@ -6,5 +6,15 @@ Monday: Just in memory for now.
 ** DONE create handler
 ** DONE create something to manage multiple queues (handler? No, create another object)
 * Support callbacks
-** add CPUT -> CPUT qname callback_url\n data ...
-** 
+** add CPUT -> CPUT qname callback_url\n data
+** now need to support a more convoluted workflow
+   as the call back will be called when a job completes
+   Going with a beanstalkdish workflow:
+       get means a client is reserving a job
+           get returns: <id> <ttr>\ndata\r\n.\r\n
+       done <id> means a jobs is done
+       touch <id> means a client needs more time to work on a job.
+           resets the ttr timer on the job
+   queue will put jobs that havent finished by the given ttr back on
+   to the available jobs queue.
+   
