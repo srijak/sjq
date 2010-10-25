@@ -45,22 +45,22 @@ class SjqHandler(val session: IoSession) extends Actor {
         sendReply("Unknown request")
     }
   }
-  private def sendReply(s: String) = {
+  private def sendReply(s: String)={
     session.write(new Response(IoBuffer.wrap((s + SjqCodec.EOM).getBytes)))
   }
   private def sendOk = {
     reply("OK" + SjqCodec.EOM)
   }
-  private def put(q: String, s: String) = {
+  private def put(q: String, s: String) ={
     getQueue(q).put(s)
   }
-  private def cput(q: String, callback_url: URL, data: String) = {
+  private def cput(q: String, callback_url: URL, data: String) ={
     //TODO: Implement CPUT
   }
   private def get(q: String): Option[String] = {
     getQueue(q).get
   }
-  private def getQueue(qName: String): InMemoryQueue[String] = {
+  private def getQueue(qName:String):InMemoryQueue[String] ={ 
     return QueuesMap.get(qName)
   }
 }
