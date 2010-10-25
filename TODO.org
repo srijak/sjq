@@ -2,6 +2,6 @@ Monday: Just in memory for now.
 * DONE Create a uniqueue datastructure, no concept of ids 
 * DONE Create protocol <PUT, GET>
 * Hook them up
-** main with mina setup
-** create handler
+** DONE main with mina setup
+** DONE create handler
 ** DONE create something to manage multiple queues (handler? No, create another object)
