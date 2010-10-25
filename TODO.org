@@ -1,4 +1,4 @@
-Just in memory for now.
-Create a uniqueue datastructure.
-Create protocol
-Hook them up
+Monday: Just in memory for now.
+* DONE Create a uniqueue datastructure, no concept of ids 
+* DONE Create protocol <PUT, GET>
+* Hook them up

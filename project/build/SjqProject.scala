@@ -1,12 +1,20 @@
 import sbt._
 
-class SmqProject(info: ProjectInfo) extends DefaultProject(info) {
+class SjqProject(info: ProjectInfo) extends DefaultProject(info) {
   //tests
   val scalacheck = "org.scala-tools.testing" % "scalacheck" % "1.5"
   val mockito = "org.mockito" % "mockito-core" % "1.7"
   val scalatest = "org.scalatest" % "scalatest" % "1.2"
   val junit = "junit" % "junit" % "4.4"
   val specs = "org.scala-tools.testing" % "specs_2.8.0" % "1.6.5"
+
+  // mina/naggati
+  val slf4j_api = "org.slf4j" % "slf4j-api" % "1.5.2"
+  val slf4j_jdk14 = "org.slf4j" % "slf4j-jdk14" % "1.5.2"
+  // use custom built one until new one is available: custom bult one is in lib
+  //val naggati = "net.lag" % "naggati" % "0.8.0"
+
+  val mina = "org.apache.mina" % "mina-core" % "2.0.0-M6"
 
    override def testClasspath = super.testClasspath +++
                                   ("src" / "test" / "resources")
