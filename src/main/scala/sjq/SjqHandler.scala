@@ -7,7 +7,8 @@ import java.io.IOException
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.collection.{ immutable, mutable }
-import Codec.{ Request, PUT, GET, Response, SjqCodec }
+import Codec.{ Request, PUT, CPUT, GET, Response, SjqCodec }
+import java.net.URL
 
 class SjqHandler(val session: IoSession) extends Actor {
   start
@@ -21,9 +22,9 @@ class SjqHandler(val session: IoSession) extends Actor {
         case MinaMessage.SessionIdle(status) => session.close(true)
         case MinaMessage.ExceptionCaught(cause) => {
           cause.getCause match {
-            case e: ProtocolError => reply("ProtocolError: " + e.getMessage + SjqCodec.EOM)
-            case i: IOException => reply("IOException: " + i.getMessage + SjqCodec.EOM)
-            case _ => reply("Error: " + cause.toString + SjqCodec.EOM)
+            case e: ProtocolError => sendReply("ProtocolError: " + e.getMessage)
+            case i: IOException => sendReply("IOException: " + i.getMessage)
+            case _ => sendReply("Error: " + cause.toString)
           }
           session.close(true)
         }
@@ -36,22 +37,28 @@ class SjqHandler(val session: IoSession) extends Actor {
         put(q, data)
         sendOk
       case GET(q) =>
-        reply(get(q).getOrElse("") + SjqCodec.EOM)
+        sendReply(get(q).getOrElse(""))
+      case CPUT(q, callback_url, data) =>
+        cput(q, callback_url, data)
+        sendReply("NOT_IMPLEMENTED_YET")
       case _ =>
-        reply("Unknown request" + SjqCodec.EOM)
+        sendReply("Unknown request")
     }
+  }
+  private def sendReply(s: String)={
+    session.write(new Response(IoBuffer.wrap((s + SjqCodec.EOM).getBytes)))
   }
   private def sendOk = {
     reply("OK" + SjqCodec.EOM)
   }
-  private def put(q: String, s: String) = {
+  private def put(q: String, s: String) ={
     getQueue(q).put(s)
+  }
+  private def cput(q: String, callback_url: URL, data: String) ={
+    //TODO: Implement CPUT
   }
   private def get(q: String): Option[String] = {
     getQueue(q).get
-  }
-  private def reply(s: String) = {
-    session.write(new Response(IoBuffer.wrap(s.getBytes)))
   }
   private def getQueue(qName:String):InMemoryQueue[String] ={ 
     return QueuesMap.get(qName)
