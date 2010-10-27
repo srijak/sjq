@@ -38,10 +38,9 @@ class SjqHandler(val session: IoSession) extends Actor {
         sendReply(put(data, opts).toString)
       case GET(opts) =>
         val item = get(opts)
-        if (item.isDefined) {
-          sendJob(item.get)
-        } else {
-          sendReply("")
+        item match {
+          case Some(j) => sendJob(j)
+          case _ => sendReply("") //block?
         }
       case _ =>
         sendReply("Unknown request")
@@ -57,13 +56,12 @@ class SjqHandler(val session: IoSession) extends Actor {
   private def sendOk = {
     reply("OK" + SjqCodec.EOM)
   }
-  private def put(s: String, opts: PutOptions) = {
-    if (opts.ttr_in_seconds.isDefined){
-      getQueue(opts.q).put(s, opts.ttr_in_seconds.get)
-    }else{
-      getQueue(opts.q).put(s, default_ttr_in_seconds)
-    }
+
+  private def put(s: String, opts: PutOptions) = opts.ttr_in_seconds match {
+    case Some(x) => getQueue(opts.q).put(s, x)
+    case _ => getQueue(opts.q).put(s, default_ttr_in_seconds)
   }
+
   private def get(opts: GetOptions): Option[Job] = {
     getQueue(opts.q).get
   }

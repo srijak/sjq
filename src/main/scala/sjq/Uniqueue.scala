@@ -15,14 +15,12 @@ class Uniqueue[A <: Job] {
     item.id
   }
 
-  def reserve: Option[A] = {
-    if (queue.size == 0) {
-      None
-    } else {
-      val itemId = queue.dequeue
-      reserved_jobs.add(itemId)
-      jobs.get(itemId)
-    }
+  def reserve: Option[A] = if (queue.size == 0) {
+    None
+  } else {
+    val itemId = queue.dequeue
+    reserved_jobs.add(itemId)
+    jobs.get(itemId)
   }
 
   def done(id: Int): Unit = {
