@@ -81,6 +81,22 @@ object SjqCodecDecoder_Spec extends Specification {
       quickDecode("DONE qname") must throwA[ProtocolError]
     }
 
+    "parse TOUCH" in {
+      quickDecode("TOUCH qname -123")
+      written.size mustEqual 1
+      written(0) must haveClass[TOUCH]
+      written(0).asInstanceOf[TOUCH].opts.q mustEqual "qname"
+      written(0).asInstanceOf[TOUCH].opts.id mustEqual -123
+    }
+
+    "parse TOUCH, non int id throws ProtocolError" in {
+      quickDecode("TOUCH qname blah") must throwA[ProtocolError]
+    }
+
+    "parse TOUCH, no id throws ProtoclError" in {
+      quickDecode("TOUCH qname") must throwA[ProtocolError]
+    }
+
     "parse invalid command" in {
       quickDecode("KAPUT\n") must throwA[ProtocolError]
     }

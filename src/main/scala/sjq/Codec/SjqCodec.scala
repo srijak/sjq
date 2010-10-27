@@ -36,6 +36,8 @@ object SjqCodec {
         state.out.write(GET(new GetOptions(rest))); End
       case "DONE" :: rest =>
         state.out.write(DONE(new DoneOptions(rest))); End
+      case "TOUCH" :: rest =>
+        state.out.write(TOUCH(new TouchOptions(rest))); End
       case _ => protocolError
     }
   })

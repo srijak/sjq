@@ -12,6 +12,7 @@ abstract class Request
 case class PUT(opts: PutOptions, data: String) extends Request
 case class GET(opts: GetOptions) extends Request
 case class DONE(opts: DoneOptions) extends Request
+case class TOUCH(opts: TouchOptions) extends Request
 
 case class Response(data: IoBuffer)
 
@@ -57,3 +58,4 @@ class  DoneOptions(opts: List[String]) extends CommandOptions(opts) with QueueRe
     case _ => throw new ProtocolError("Need id of job to mark as done")
   }
 }
+class TouchOptions(opts: List[String]) extends DoneOptions(opts){}

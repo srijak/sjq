@@ -59,4 +59,11 @@ class CommandOptionsTest extends JUnitSuite {
     assertSame(opts.id, -123)
     assertSame(opts.q, "qname")
   }
+
+  @Test
+  def parse_Touch_Options_qname_and_id() {
+    val opts = new TouchOptions(List("qname", "-123"))
+    assertSame(opts.id, -123)
+    assertSame(opts.q, "qname")
+  } 
 }
