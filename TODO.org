@@ -9,7 +9,7 @@ Monday: Just in memory for now.
 ** add CPUT -> CPUT qname callback_url\n data
 ** now need to support a more convoluted workflow
    as the call back will be called when a job completes
-   Going with a beanstalkdish workflow:
+***   Going with a beanstalkdish workflow:
        get means a client is reserving a job
            get returns: <id> <ttr>\ndata\r\n.\r\n
        done <id> means a jobs is done
@@ -17,4 +17,9 @@ Monday: Just in memory for now.
            resets the ttr timer on the job
    queue will put jobs that havent finished by the given ttr back on
    to the available jobs queue.
-   
+*** For this need to:
+**** DONE Need to add a job object, contains id 
+**** DONE PUTs return id
+**** DONE GETS return the id and ttr for the job too
+**** Something that runs through reserved jobs and puts them back in queue if ttr expires
+**** Support DONE message

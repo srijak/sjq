@@ -1,13 +1,11 @@
 package sjq.Codec
-
-import java.nio.ByteOrder
 import net.lag.naggati._
 import org.apache.mina.core.buffer.IoBuffer
 import org.apache.mina.core.filterchain.IoFilter
 import org.apache.mina.core.session.{ DummySession, IoSession }
 import org.apache.mina.filter.codec._
 import org.specs._
-import scala.collection.{ immutable, mutable }
+import scala.collection.{ mutable }
 
 object SjqCodecDecoder_Spec extends Specification {
 
@@ -33,7 +31,7 @@ object SjqCodecDecoder_Spec extends Specification {
       quickDecode("PUT qname\n{\"key\": \"value\"}")
       written(0) must haveClass[PUT]
       written(0).asInstanceOf[PUT].data mustEqual "{\"key\": \"value\"}"
-      written(0).asInstanceOf[PUT].q mustEqual "qname"
+      written(0).asInstanceOf[PUT].opts.q mustEqual "qname"
     }
 
     "parse PUT, no queue name throws ProtocolError" in {
@@ -52,7 +50,7 @@ object SjqCodecDecoder_Spec extends Specification {
       quickDecode("GET qname")
       written.size mustEqual 1
       written(0) must haveClass[GET]
-      written(0).asInstanceOf[GET].q mustEqual "qname"
+      written(0).asInstanceOf[GET].opts.q mustEqual "qname"
     }
 
     "parse GET, no queue name throws ProtocolError" in {
@@ -70,22 +68,5 @@ object SjqCodecDecoder_Spec extends Specification {
     "parse invalid command" in {
       quickDecode("KAPUT\n") must throwA[ProtocolError]
     }
-
-    "parse CPUT" in {
-      quickDecode("CPUT qname http://google.com\nblah blah blah")
-      written.size mustEqual 1
-      written(0) must haveClass[CPUT]
-      written(0).asInstanceOf[CPUT].q mustEqual "qname"
-      written(0).asInstanceOf[CPUT].callback_url.getHost mustEqual "google.com"
-    }
-
-    "parse CPUT, invalid URL throws ProtocolError" in {
-      quickDecode("CPUT qname google.com\n blah blah blah") must throwA[ProtocolError]
-    }
-
-    "parse CPUT, empty URL throws ProtocolError" in {
-      quickDecode("CPUT qname  \n blah blah blah") must throwA[ProtocolError]
-    }
-
   }
 }

@@ -7,10 +7,11 @@ import java.io.IOException
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.collection.{ immutable, mutable }
-import Codec.{ Request, PUT, CPUT, GET, Response, SjqCodec }
+import Codec.{ Request, PUT, GET, Response, SjqCodec, PutOptions, GetOptions }
 import java.net.URL
 
 class SjqHandler(val session: IoSession) extends Actor {
+  val default_ttr_in_seconds = 300
   start
 
   def act = {
@@ -33,34 +34,42 @@ class SjqHandler(val session: IoSession) extends Actor {
   }
   private def handle(request: Request) = {
     request match {
-      case PUT(q, data) =>
-        sendReply(put(q, data).toString)
-      case GET(q) =>
-        sendReply(get(q).getOrElse(""))
-      case CPUT(q, callback_url, data) =>
-        cput(q, callback_url, data)
-        sendReply("NOT_IMPLEMENTED_YET")
+      case PUT(opts, data) =>
+        sendReply(put(data, opts).toString)
+      case GET(opts) =>
+        val item = get(opts)
+        if (item.isDefined) {
+          sendJob(item.get)
+        } else {
+          sendReply("")
+        }
       case _ =>
         sendReply("Unknown request")
     }
   }
-  private def sendReply(s: String)={
+  private def sendReply(s: String) = {
     session.write(new Response(IoBuffer.wrap((s + SjqCodec.EOM).getBytes)))
   }
+  private def sendJob(j: Job) = {
+    sendReply(j.id + " " + j.ttr_in_seconds + "\n" + j.data)
+  }
+
   private def sendOk = {
     reply("OK" + SjqCodec.EOM)
   }
-  private def put(q: String, s: String) ={
-    getQueue(q).put(s)
+  private def put(s: String, opts: PutOptions) = {
+    if (opts.ttr_in_seconds.isDefined){
+      getQueue(opts.q).put(s, opts.ttr_in_seconds.get)
+    }else{
+      getQueue(opts.q).put(s, default_ttr_in_seconds)
+    }
   }
-  private def cput(q: String, callback_url: URL, data: String) ={
-    //TODO: Implement CPUT
+  private def get(opts: GetOptions): Option[Job] = {
+    getQueue(opts.q).get
   }
-  private def get(q: String): Option[String] = {
-    getQueue(q).get
-  }
-  private def getQueue(qName:String):InMemoryQueue[String] ={ 
+  private def getQueue(qName: String): InMemoryQueue[Job] = {
     return QueuesMap.get(qName)
   }
+
 }
 

@@ -4,12 +4,12 @@ import org.specs._
 
 object InMemoryQueueSpec extends Specification {
 
-  var queue = new InMemoryQueue[String]()
-
+  var queue = new InMemoryQueue[Job]()
+  
   "In memory queue " should {
 
     doBefore {
-      queue = new InMemoryQueue[String]()
+      queue = new InMemoryQueue[Job]()
     }
 
     "get from empty queue returns  None" in {
@@ -23,7 +23,7 @@ object InMemoryQueueSpec extends Specification {
 
     "can remove item from queue" in {
       queue.put("Ho")
-      queue.get() must beSome("Ho")
+      queue.get().get.data must be("Ho")
     }
 
     "adding multiple times only contains 1" in {
@@ -38,9 +38,9 @@ object InMemoryQueueSpec extends Specification {
       queue.put("2")
       queue.put("3")
 
-      queue.get() must beSome("1")
-      queue.get() must beSome("2")
-      queue.get() must beSome("3")
+      queue.get().get.data must be("1")
+      queue.get().get.data must be("2")
+      queue.get().get.data must be("3")
     }
   }
 }

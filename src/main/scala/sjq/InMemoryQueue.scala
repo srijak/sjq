@@ -3,12 +3,12 @@ package sjq
 import java.net.URL
 import scala.collection.mutable.HashSet
 
-class InMemoryQueue[A] {
+class InMemoryQueue[A <: Job] {
   var availableJobs = new Uniqueue[A]()
 
-  def put(item: A): Int = {
+  def put(implicit item: A): Int = {
     availableJobs.synchronized {
-      availableJobs.enqueue(item)
+      availableJobs.put(item)
     }
   }
 
@@ -17,12 +17,12 @@ class InMemoryQueue[A] {
       if (availableJobs.isEmpty) {
         None // block instead?
       } else {
-        availableJobs.dequeue
+        availableJobs.reserve
       }
     }
   }
 
-  def contains(item: A): Boolean = {
+  def contains(implicit item: A): Boolean = {
     availableJobs.synchronized {
       availableJobs.contains(item)
     }

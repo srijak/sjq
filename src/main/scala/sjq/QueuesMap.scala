@@ -4,13 +4,12 @@ import scala.collection.mutable.HashMap
 
 object QueuesMap {
 
-  val queues = new HashMap[String, InMemoryQueue[String]]()  
+  val queues = new HashMap[String, InMemoryQueue[Job]]()  
 
-  def get(qName: String): InMemoryQueue[String] = {
+  def get(qName: String): InMemoryQueue[Job] = {
     queues.synchronized {
       if (!queues.contains(qName)) {
-        val q = new InMemoryQueue[String]()
-        queues.put(qName, q)
+        queues.put(qName, new InMemoryQueue[Job]())
       }
     }
     queues.get(qName).get

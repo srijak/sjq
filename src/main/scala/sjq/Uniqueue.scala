@@ -1,45 +1,51 @@
 package sjq
 
-import scala.collection.mutable.{ Queue, HashMap }
+import scala.collection.mutable.{ Queue, HashMap, HashSet }
 
-class Uniqueue[A] {
+class Uniqueue[A <: Job] {
   val queue = new Queue[Int]()
   val jobs = new HashMap[Int, A]()
+  val reserved_jobs = new HashSet[Int]()
 
-  def enqueue(item: A): Int= {
-    val id = hash(item) //TODO: hmm this may need to be rethought
-    if (!jobs.contains(id)) {
-      queue.enqueue(id)
-      jobs.put(id, item)
+  def put(item: A): Int = {
+    if (!jobs.contains(item.id)) {
+      queue.enqueue(item.id)
+      jobs.put(item.id, item)
     }
-    id
+    item.id
   }
 
-  def dequeue: Option[A] = {
-    if (jobs.isEmpty || queue.size == 0) {
+  def reserve: Option[A] = {
+    if (queue.size == 0) {
       None
     } else {
-      jobs.remove(queue.dequeue)
+      val itemId = queue.dequeue
+      reserved_jobs.add(itemId)
+      jobs.get(itemId)
     }
+  }
+
+  def completeItem(item: A): Unit = {
+    complete(item.id)
+  }
+
+  def complete(id: Int): Unit = {
+    reserved_jobs.removeEntry(id)
+    jobs.remove(id)
   }
 
   def isEmpty: Boolean = {
-    jobs.isEmpty
+    queue.size == 0
   }
 
   def contains(item: A): Boolean = {
-    containsItemWithId(hash(item))
+    containsItemWithId(item.id)
   }
 
-  def containsItemWithId(key: Int): Boolean ={
-    jobs.contains(key)
+  def containsItemWithId(id: Int): Boolean = {
+    jobs.contains(id)
   }
   def size: Int = {
-    jobs.size
-  }
-  
-  private def hash(s: A): Int={   //hmm geneicness may need to be rethought since we depend on toString
-                                  //maybe hash generator shoudl be injected?
-    MurmurHash2.hash32(s.toString)
+    queue.size
   }
 }
