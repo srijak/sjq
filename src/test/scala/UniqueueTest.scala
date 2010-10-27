@@ -46,6 +46,14 @@ class UniqueueTest extends JUnitSuite {
     q.put(getJob("B"))
     assertTrue(q.contains(getJob("B")))
   }
+  
+  @Test 
+  def done_means_queue_doesnt_have_item(){
+    q.put(getJob("C"))
+    val job = q.reserve.get
+    q.done(job.id)
+    assertFalse(q.contains(job))
+  }
 
   @Test
   def size_works(){

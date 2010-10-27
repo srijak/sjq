@@ -25,11 +25,7 @@ class Uniqueue[A <: Job] {
     }
   }
 
-  def completeItem(item: A): Unit = {
-    complete(item.id)
-  }
-
-  def complete(id: Int): Unit = {
+  def done(id: Int): Unit = {
     reserved_jobs.removeEntry(id)
     jobs.remove(id)
   }

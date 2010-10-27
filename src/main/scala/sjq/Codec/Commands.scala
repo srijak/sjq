@@ -11,11 +11,12 @@ import scala.collection.mutable.HashSet
 abstract class Request
 case class PUT(opts: PutOptions, data: String) extends Request
 case class GET(opts: GetOptions) extends Request
+case class DONE(opts: DoneOptions) extends Request
 
 case class Response(data: IoBuffer)
 
-abstract class CommandOptions(val opts: List[String]) {
-
+trait QueueRequired {
+  val opts : List[String]
   val q: String = { assertValidQueueName(opts.head); opts.head }
   require(opts.length > 0)
 
@@ -25,11 +26,14 @@ abstract class CommandOptions(val opts: List[String]) {
     }
   }
 }
-
-class PutOptions(opts: List[String]) extends CommandOptions(opts) {
+trait HasCallbackUrls {
+  val opts: List[String]
   val callback_urls = HashSet() ++ opts.map(s => try { new URL(s) } catch { case _ => None }) //better way to do this? may be slow.
     .filter(_ != None)
     .asInstanceOf[List[URL]]
+}
+trait HasTTR {
+  val opts: List[String]
   val ttr_in_seconds: Option[Int] = try {
     opts match {
       case a :: x :: _ => Some(x.toInt)
@@ -40,5 +44,16 @@ class PutOptions(opts: List[String]) extends CommandOptions(opts) {
   }
 }
 
-class GetOptions(opts: List[String]) extends CommandOptions(opts) {
+abstract class CommandOptions(val opts: List[String]) {}
+
+class PutOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired with HasTTR with HasCallbackUrls {}
+
+class GetOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired{}
+
+class  DoneOptions(opts: List[String]) extends CommandOptions(opts){
+  val id : Int = try {
+    opts.head.toInt
+  }catch{
+    case _ => throw new ProtocolError("Need id of job to mark as done")
+  }
 }

@@ -1,6 +1,7 @@
 import sbt._
+import reaktor.scct.ScctProject
 
-class SjqProject(info: ProjectInfo) extends DefaultProject(info) {
+class SjqProject(info: ProjectInfo) extends DefaultProject(info) with ScctProject {
   //tests
   val scalacheck = "org.scala-tools.testing" % "scalacheck" % "1.5"
   val mockito = "org.mockito" % "mockito-core" % "1.7"

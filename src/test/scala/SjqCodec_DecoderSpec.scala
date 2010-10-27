@@ -65,6 +65,21 @@ object SjqCodecDecoder_Spec extends Specification {
       quickDecode("GET queue_name_that_is_longer_than_30_characters") must throwA[ProtocolError]
     }
 
+    "parse DONE" in {
+      quickDecode("DONE -123")
+      written.size mustEqual 1
+      written(0) must haveClass[DONE]
+      written(0).asInstanceOf[DONE].opts.id mustEqual -123
+    }
+
+    "parse DONE, non int id throws ProtocolError" in {
+      quickDecode("DONE blah") must throwA[ProtocolError]
+    }
+
+    "parse DONE, no id throws ProtoclError" in {
+      quickDecode("DONE") must throwA[ProtocolError]
+    }
+
     "parse invalid command" in {
       quickDecode("KAPUT\n") must throwA[ProtocolError]
     }
