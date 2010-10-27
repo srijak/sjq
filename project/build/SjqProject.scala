@@ -14,9 +14,10 @@ class SjqProject(info: ProjectInfo) extends DefaultProject(info) with ScctProjec
   val slf4j_jdk14 = "org.slf4j" % "slf4j-jdk14" % "1.5.2"
   // use custom built one until new one is available: custom bult one is in lib
   //val naggati = "net.lag" % "naggati" % "0.8.0"
-
   val mina = "org.apache.mina" % "mina-core" % "2.0.0-M6"
 
-   override def testClasspath = super.testClasspath +++
-                                  ("src" / "test" / "resources")
+  //http client
+  val dispatch = "net.databinder" %% "dispatch-http" % "0.7.7"
+
+  override def testClasspath = super.testClasspath +++  ("src" / "test" / "resources")
 }

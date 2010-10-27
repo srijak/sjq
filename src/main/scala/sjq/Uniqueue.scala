@@ -1,6 +1,7 @@
 package sjq
 
 import scala.collection.mutable.{ Queue, HashMap, HashSet }
+import java.net.URL
 
 class Uniqueue[A <: Job] {
   val queue = new Queue[Int]()
@@ -23,9 +24,13 @@ class Uniqueue[A <: Job] {
     jobs.get(itemId)
   }
 
-  def done(id: Int): Unit = {
+  def done(id: Int): Option[List[URL]] = {
     reserved_jobs.removeEntry(id)
-    jobs.remove(id)
+    val item = jobs.remove(id)
+    item match {
+      case Some(x) => x.callback_urls
+      case _ => None
+    }
   }
 
   def isEmpty: Boolean = {

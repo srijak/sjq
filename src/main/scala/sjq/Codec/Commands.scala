@@ -50,9 +50,9 @@ class PutOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequ
 
 class GetOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired{}
 
-class  DoneOptions(opts: List[String]) extends CommandOptions(opts){
+class  DoneOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired {
   val id : Int = try {
-    opts.head.toInt
+    opts.tail.head.toInt
   }catch{
     case _ => throw new ProtocolError("Need id of job to mark as done")
   }

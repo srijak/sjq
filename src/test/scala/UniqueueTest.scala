@@ -4,6 +4,7 @@ import org.scalatest.junit.JUnitSuite
 import junit.framework.Assert._
 import org.junit.Test
 import org.junit.Before
+import java.net.URL
 
 class UniqueueTest extends JUnitSuite {
   var q: Uniqueue[Job] = _  
@@ -53,6 +54,19 @@ class UniqueueTest extends JUnitSuite {
     val job = q.reserve.get
     q.done(job.id)
     assertFalse(q.contains(job))
+  }
+
+  @Test 
+  def done_returns_list_of_callback_urls(){
+    val job =getJob("C")
+    job.callback_urls = Some(List[URL](new URL("http://google.com"))) //may need to be rethought
+    q.put(job)
+    assertTrue(q.done(q.reserve.get.id).get.contains(new URL("http://google.com")))
+  }
+  @Test 
+  def done_returns_none_when_no_callbacksset(){
+    q.put(getJob("C"))
+    assertEquals(q.done(q.reserve.get.id), None)
   }
 
   @Test

@@ -17,7 +17,7 @@ object smq {
   def main(args: Array[String]): Unit = {
     setMaxThreads
     initializeAcceptor
-
+    CallbackActor.start()
     println("sjq up and listening on " + host + ":" + port)
   }
 

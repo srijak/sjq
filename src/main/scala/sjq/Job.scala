@@ -12,6 +12,9 @@ class Job(val data: String, val ttr_in_seconds: Int, var callback_urls: Option[L
   override def equals(o: Any): Boolean ={
     o.isInstanceOf[Job] && (this.data eq o.asInstanceOf[Job].data);
   }
+  override def toString : String ={
+    return "<id:" + id + "> <callbacks: " + this.callback_urls.getOrElse(List[URL]()) + ">" +  data + "\n"
+  }
 }
 
 object Job {

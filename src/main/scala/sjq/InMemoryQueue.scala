@@ -21,6 +21,15 @@ class InMemoryQueue[A <: Job] {
       }
     }
   }
+  def done(id: Int): List[URL] ={
+    availableJobs.synchronized{
+      val urls = availableJobs.done(id)
+      urls match {
+        case Some(x) => x
+        case _ => List[URL]()
+      }
+    }
+  }
 
   def contains(implicit item: A): Boolean = {
     availableJobs.synchronized {

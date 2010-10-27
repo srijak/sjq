@@ -7,7 +7,7 @@ import java.io.IOException
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.collection.{ immutable, mutable }
-import Codec.{ Request, PUT, GET, Response, SjqCodec, PutOptions, GetOptions }
+import Codec.{ Request, PUT, GET, DONE, Response, SjqCodec, PutOptions, GetOptions, DoneOptions }
 import java.net.URL
 
 class SjqHandler(val session: IoSession) extends Actor {
@@ -42,6 +42,9 @@ class SjqHandler(val session: IoSession) extends Actor {
           case Some(j) => sendJob(j)
           case _ => sendReply("") //block?
         }
+      case DONE(opts) =>
+        done(opts)
+        sendOk
       case _ =>
         sendReply("Unknown request")
     }
@@ -54,16 +57,27 @@ class SjqHandler(val session: IoSession) extends Actor {
   }
 
   private def sendOk = {
-    reply("OK" + SjqCodec.EOM)
+    sendReply("OK")
   }
 
-  private def put(s: String, opts: PutOptions) = opts.ttr_in_seconds match {
-    case Some(x) => getQueue(opts.q).put(s, x)
-    case _ => getQueue(opts.q).put(s, default_ttr_in_seconds)
+  private def put(s: String, opts: PutOptions) ={
+    val callback_urls = Some(opts.callback_urls.toList)    
+    
+    getQueue(opts.q).put(opts.ttr_in_seconds match {
+      case Some(x) => createJob(s, x, callback_urls)
+      case _ => createJob(s, default_ttr_in_seconds, callback_urls)
+    })
   }
 
+  private def createJob(data:String, ttr:Int, callback_urls: Option[List[URL]]): Job ={
+    new Job(data, ttr, callback_urls)
+  }
   private def get(opts: GetOptions): Option[Job] = {
     getQueue(opts.q).get
+  }
+
+  private def done(opts: DoneOptions): Unit ={
+    CallbackActor ! getQueue(opts.q).done(opts.id)
   }
   private def getQueue(qName: String): InMemoryQueue[Job] = {
     return QueuesMap.get(qName)

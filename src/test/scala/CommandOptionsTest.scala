@@ -54,8 +54,9 @@ class CommandOptionsTest extends JUnitSuite {
   }
   
   @Test
-  def parse_Done_Options_only_id() {
-    val opts = new DoneOptions(List("-123"))
+  def parse_Done_Options_qname_and_id() {
+    val opts = new DoneOptions(List("qname", "-123"))
     assertSame(opts.id, -123)
+    assertSame(opts.q, "qname")
   }
 }

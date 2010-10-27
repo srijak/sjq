@@ -66,18 +66,19 @@ object SjqCodecDecoder_Spec extends Specification {
     }
 
     "parse DONE" in {
-      quickDecode("DONE -123")
+      quickDecode("DONE qname -123")
       written.size mustEqual 1
       written(0) must haveClass[DONE]
+      written(0).asInstanceOf[DONE].opts.q mustEqual "qname"
       written(0).asInstanceOf[DONE].opts.id mustEqual -123
     }
 
     "parse DONE, non int id throws ProtocolError" in {
-      quickDecode("DONE blah") must throwA[ProtocolError]
+      quickDecode("DONE qname blah") must throwA[ProtocolError]
     }
 
     "parse DONE, no id throws ProtoclError" in {
-      quickDecode("DONE") must throwA[ProtocolError]
+      quickDecode("DONE qname") must throwA[ProtocolError]
     }
 
     "parse invalid command" in {
