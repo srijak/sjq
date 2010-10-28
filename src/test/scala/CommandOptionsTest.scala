@@ -62,8 +62,9 @@ class CommandOptionsTest extends JUnitSuite {
 
   @Test
   def parse_Touch_Options_qname_and_id() {
-    val opts = new TouchOptions(List("qname", "-123"))
-    assertSame(opts.id, -123)
+    val opts = new TouchOptions(List("qname", "-123", "250"))
+    assertEquals(opts.additional_time_in_seconds, 250)
+    assertEquals(opts.id, -123)
     assertSame(opts.q, "qname")
   } 
 }

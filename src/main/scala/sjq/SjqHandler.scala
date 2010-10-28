@@ -7,7 +7,7 @@ import java.io.IOException
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.collection.{ immutable, mutable }
-import Codec.{ Request, PUT, GET, DONE, Response, SjqCodec, PutOptions, GetOptions, DoneOptions }
+import Codec._
 import java.net.URL
 
 class SjqHandler(val session: IoSession) extends Actor {
@@ -45,6 +45,9 @@ class SjqHandler(val session: IoSession) extends Actor {
       case DONE(opts) =>
         done(opts)
         sendOk
+      case TOUCH(opts) =>
+        touch(opts)
+        sendOk
       case _ =>
         sendReply("Unknown request")
     }
@@ -60,23 +63,25 @@ class SjqHandler(val session: IoSession) extends Actor {
     sendReply("OK")
   }
 
-  private def put(s: String, opts: PutOptions) ={
-    val callback_urls = Some(opts.callback_urls.toList)    
-    
+  private def put(s: String, opts: PutOptions) = {
+    val callback_urls = Some(opts.callback_urls.toList)
+
     getQueue(opts.q).put(opts.ttr_in_seconds match {
       case Some(x) => createJob(s, x, callback_urls)
       case _ => createJob(s, default_ttr_in_seconds, callback_urls)
     })
   }
 
-  private def createJob(data:String, ttr:Int, callback_urls: Option[List[URL]]): Job ={
+  private def createJob(data: String, ttr: Int, callback_urls: Option[List[URL]]): Job = {
     new Job(data, ttr, callback_urls)
   }
   private def get(opts: GetOptions): Option[Job] = {
     getQueue(opts.q).get
   }
-
-  private def done(opts: DoneOptions): Unit ={
+  private def touch(opts: TouchOptions): Unit={
+    //TODO
+  }
+  private def done(opts: DoneOptions): Unit = {
     CallbackActor ! getQueue(opts.q).done(opts.id)
   }
   private def getQueue(qName: String): InMemoryQueue[Job] = {

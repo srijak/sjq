@@ -17,7 +17,7 @@ case class TOUCH(opts: TouchOptions) extends Request
 case class Response(data: IoBuffer)
 
 trait QueueRequired {
-  val opts : List[String]
+  val opts: List[String]
   val q: String = { assertValidQueueName(opts.head); opts.head }
   require(opts.length > 0)
 
@@ -49,13 +49,19 @@ abstract class CommandOptions(val opts: List[String]) {}
 
 class PutOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired with HasTTR with HasCallbackUrls {}
 
-class GetOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired{}
+class GetOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired {}
 
-class  DoneOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired {
-  val id : Int = try {
+class DoneOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired {
+  val id: Int = try {
     opts.tail.head.toInt
-  }catch{
+  } catch {
     case _ => throw new ProtocolError("Need id of job to mark as done")
   }
 }
-class TouchOptions(opts: List[String]) extends DoneOptions(opts){}
+class TouchOptions(opts: List[String]) extends DoneOptions(opts) {
+  val additional_time_in_seconds: Int = try {
+    List(opts.tail.tail.head.toInt, 2).max
+  } catch {
+    case _ => throw new ProtocolError("Needs additional time requested(in seconds)")
+  }
+}

@@ -82,11 +82,25 @@ object SjqCodecDecoder_Spec extends Specification {
     }
 
     "parse TOUCH" in {
-      quickDecode("TOUCH qname -123")
+      quickDecode("TOUCH qname -123 250")
       written.size mustEqual 1
       written(0) must haveClass[TOUCH]
       written(0).asInstanceOf[TOUCH].opts.q mustEqual "qname"
       written(0).asInstanceOf[TOUCH].opts.id mustEqual -123
+      written(0).asInstanceOf[TOUCH].opts.additional_time_in_seconds mustEqual 250
+    }
+
+    "parse TOUCH addtional time less than 2 seconds gets silently upped to 2secs" in {
+      List(-200, -123, -43,-23, 0, 1, 2).foreach( i => {
+        quickDecode("TOUCH qname -123 " + i.toString)
+        written.size mustEqual 1
+        written(0) must haveClass[TOUCH]
+        written(0).asInstanceOf[TOUCH].opts.q mustEqual "qname"
+        written(0).asInstanceOf[TOUCH].opts.id mustEqual -123
+        println( written(0).asInstanceOf[TOUCH].opts.additional_time_in_seconds)
+        written(0).asInstanceOf[TOUCH].opts.additional_time_in_seconds mustEqual 2
+        written.clear()
+      })
     }
 
     "parse TOUCH, non int id throws ProtocolError" in {
