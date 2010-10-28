@@ -19,6 +19,10 @@ object CallbackActor extends Actor {
   }
   private def doGetURL(u: URL): Unit = {
     val http = new Http
-    http(u.toString >~ { _.getLines})
+		try {
+	    http(u.toString >~ { _.getLines})
+		} catch {
+			case _ => println("Unable to hit callback: " + u.toString)
+		}
   }
 }
