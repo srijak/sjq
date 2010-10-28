@@ -10,7 +10,7 @@ import scala.actors.Actor._
 import Codec.SjqCodec
 import scala.collection.mutable.HashMap
 
-object smq {
+object sjq {
   val host = "0.0.0.0"
   val port = 5537
 

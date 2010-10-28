@@ -15,7 +15,6 @@ object SjqCodec {
     def encode(session: IoSession, message: AnyRef, out: ProtocolEncoderOutput) = {
       val buffer = message.asInstanceOf[Response].data
       out.write(buffer)
-      out.write(EOM)
     }
 
     def dispose(session: IoSession): Unit = {}
