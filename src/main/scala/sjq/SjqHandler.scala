@@ -48,6 +48,10 @@ class SjqHandler(val session: IoSession) extends Actor {
       case TOUCH(opts) =>
         touch(opts)
         sendOk
+      case STATUS(opts) =>
+        sendReply(status(opts).toString)
+      case QLIST() =>
+        sendReply(qlist)
       case _ =>
         sendReply("Unknown request")
     }
@@ -58,7 +62,7 @@ class SjqHandler(val session: IoSession) extends Actor {
   private def sendJob(j: Job) = {
     sendReply(j.id + " " + j.ttr_in_seconds + "\n" + j.data)
   }
-
+  
   private def sendOk = {
     sendReply("OK")
   }
@@ -83,6 +87,12 @@ class SjqHandler(val session: IoSession) extends Actor {
   }
   private def done(opts: DoneOptions): Unit = {
     CallbackActor ! getQueue(opts.q).done(opts.id)
+  }
+  private def status(opts: StatusOptions): QueryStats={
+    QueuesMap.get(opts.q).getStats
+  }
+  private def qlist: String ={
+    QueuesMap.getQueuesList.reduceLeft(_ + "\n" + _)
   }
   private def getQueue(qName: String): InMemoryQueue[Job] = {
     return QueuesMap.get(qName)

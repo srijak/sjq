@@ -21,4 +21,13 @@ class QueuesMapTest extends JUnitSuite {
     val q1 = QueuesMap.get("q1")
     assertNotSame(q0, q1)
   }
+  @Test
+  def test_can_get_list_of_current_queues(){
+    QueuesMap.clear
+    assertEquals(0, QueuesMap.getQueuesList.size)
+    QueuesMap.get("q0")
+    assertEquals(1, QueuesMap.getQueuesList.size)
+    QueuesMap.remove("q0")
+    assertEquals(0, QueuesMap.getQueuesList.size)
+  }
 }

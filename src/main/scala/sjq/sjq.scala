@@ -13,10 +13,11 @@ import scala.collection.mutable.HashMap
 object sjq {
   val host = "0.0.0.0"
   val port = 5537
+  val statusPort = 5538
 
   def main(args: Array[String]): Unit = {
     setMaxThreads
-    initializeAcceptor
+    initializeQueueAcceptor
     CallbackActor.start()
     println("sjq up and listening on " + host + ":" + port)
   }
@@ -25,8 +26,8 @@ object sjq {
     val maxThreads = List(Runtime.getRuntime.availableProcessors * 2, 2).max
     System.setProperty("actors.maxPoolSize", maxThreads.toString)
   }
-
-  def initializeAcceptor = {
+  
+  def initializeQueueAcceptor = {
     var acceptorExecutor = Executors.newCachedThreadPool()
     var acceptor = new NioSocketAcceptor(acceptorExecutor, new NioProcessor(acceptorExecutor))
 

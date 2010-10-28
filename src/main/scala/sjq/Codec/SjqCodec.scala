@@ -22,12 +22,14 @@ object SjqCodec {
 
   val decoder = new Decoder(readDelimiterBuffer(EOM_Bytes) { buffer =>
     def protocolError = throw new ProtocolError("Malformed Request")
-
+    
     val msg = new String(buffer, 0, buffer.length - EOM_Bytes.length)
       .split("\n", 2)
     val cmd = msg(0).split(' ').toList.map(e => e.trim)
     cmd match {
       case Nil => protocolError
+      case "QLIST" :: rest =>
+        state.out.write(QLIST()); End
       case _ :: Nil => protocolError
       case "PUT" :: rest =>
         state.out.write(PUT(new PutOptions(rest), msg(1))); End
@@ -37,6 +39,8 @@ object SjqCodec {
         state.out.write(DONE(new DoneOptions(rest))); End
       case "TOUCH" :: rest =>
         state.out.write(TOUCH(new TouchOptions(rest))); End
+      case "STATUS" :: rest =>
+        state.out.write(STATUS(new StatusOptions(rest))); End
       case _ => protocolError
     }
   })

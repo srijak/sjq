@@ -13,6 +13,8 @@ case class PUT(opts: PutOptions, data: String) extends Request
 case class GET(opts: GetOptions) extends Request
 case class DONE(opts: DoneOptions) extends Request
 case class TOUCH(opts: TouchOptions) extends Request
+case class STATUS(opts: StatusOptions) extends Request
+case class QLIST() extends Request
 
 case class Response(data: IoBuffer)
 
@@ -65,3 +67,4 @@ class TouchOptions(opts: List[String]) extends DoneOptions(opts) {
     case _ => throw new ProtocolError("Needs additional time requested(in seconds)")
   }
 }
+class StatusOptions(opts: List[String]) extends CommandOptions(opts) with QueueRequired{}

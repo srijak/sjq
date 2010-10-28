@@ -97,7 +97,6 @@ object SjqCodecDecoder_Spec extends Specification {
         written(0) must haveClass[TOUCH]
         written(0).asInstanceOf[TOUCH].opts.q mustEqual "qname"
         written(0).asInstanceOf[TOUCH].opts.id mustEqual -123
-        println( written(0).asInstanceOf[TOUCH].opts.additional_time_in_seconds)
         written(0).asInstanceOf[TOUCH].opts.additional_time_in_seconds mustEqual 2
         written.clear()
       })
@@ -107,12 +106,26 @@ object SjqCodecDecoder_Spec extends Specification {
       quickDecode("TOUCH qname blah") must throwA[ProtocolError]
     }
 
-    "parse TOUCH, no id throws ProtoclError" in {
+    "parse TOUCH, no id throws ProtocolError" in {
       quickDecode("TOUCH qname") must throwA[ProtocolError]
     }
 
+    "parse STATUS" in {
+      quickDecode("STATUS qname")
+      written.size mustEqual 1
+      written(0) must haveClass[STATUS]
+      written(0).asInstanceOf[STATUS].opts.q mustEqual "qname"
+    }
+    "parse STATUS, no queue throws ProtocolError" in {
+      quickDecode("STATUS") must throwA[ProtocolError]
+    }
     "parse invalid command" in {
       quickDecode("KAPUT\n") must throwA[ProtocolError]
+    }
+    "parse QLIST" in {
+      quickDecode("QLIST")
+      written.size mustEqual 1
+      written(0) must haveClass[QLIST]
     }
   }
 }

@@ -42,5 +42,21 @@ object InMemoryQueueSpec extends Specification {
       queue.get().get.data must be("2")
       queue.get().get.data must be("3")
     }
+    "queue supports  stats" in{
+      queue.put ("1")
+      queue.getStats.totalMessages.intValue() must be(1)
+      queue.getStats.availableMessages.intValue() must be(1)
+      queue.getStats.reservedMessages.intValue() must be(0)
+      
+      val job = queue.get.get
+      queue.getStats.totalMessages.intValue() must be(1)
+      queue.getStats.availableMessages.intValue() must be(0)
+      queue.getStats.reservedMessages.intValue() must be(1)
+      
+      queue.done(job.id)
+      queue.getStats.totalMessages.intValue() must be(1)
+      queue.getStats.availableMessages.intValue() must be(0)
+      queue.getStats.reservedMessages.intValue() must be(0)
+    }
   }
 }
