@@ -15,6 +15,7 @@ case class DONE(opts: DoneOptions) extends Request
 case class TOUCH(opts: TouchOptions) extends Request
 case class STATUS(opts: StatusOptions) extends Request
 case class QLIST() extends Request
+case class HELP(opts: List[String]) extends Request
 
 case class Response(data: IoBuffer)
 

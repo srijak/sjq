@@ -30,6 +30,8 @@ object SjqCodec {
       case Nil => protocolError
       case "QLIST" :: rest =>
         state.out.write(QLIST()); End
+      case "HELP" :: rest =>
+        state.out.write(HELP(rest)); End
       case _ :: Nil => protocolError
       case "PUT" :: rest =>
         state.out.write(PUT(new PutOptions(rest), msg(1))); End
@@ -40,7 +42,7 @@ object SjqCodec {
       case "TOUCH" :: rest =>
         state.out.write(TOUCH(new TouchOptions(rest))); End
       case "STATUS" :: rest =>
-        state.out.write(STATUS(new StatusOptions(rest))); End
+        state.out.write(STATUS(new StatusOptions(rest))); End      
       case _ => protocolError
     }
   })

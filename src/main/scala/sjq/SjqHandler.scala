@@ -52,6 +52,11 @@ class SjqHandler(val session: IoSession) extends Actor {
         sendReply(status(opts).toString)
       case QLIST() =>
         sendReply(qlist)
+      case HELP(opts) =>
+        opts match {
+          case Nil => sendReply(help(List[String]("PUT", "GET", "DONE", "TOUCH", "QLIST", "STATUS", "HELP") ))
+          case _ => sendReply(help(opts))
+        }
       case _ =>
         sendReply("Unknown request")
     }
@@ -84,6 +89,23 @@ class SjqHandler(val session: IoSession) extends Actor {
   }
   private def touch(opts: TouchOptions): Unit = {
     //TODO
+  }
+  private def help(opts: List[String]):String ={
+    opts match {
+      case Nil => "\n"
+      case a::rest =>
+        val current = a match {
+          case "QLIST" => "\nQLIST\n\tlist all queues on server"
+          case "STATUS" => "\nSTATUS <qname>\n\tShow stats on the given queue"
+          case "PUT" => "\nPUT <qname> [ttr] [callback_urls]\n<DATA>\n\t add <DATA> to queue with optional ttr and callback urls"
+          case "GET" => "\nGET <qname>\n\t Get item from the given queue"
+          case "DONE" => "\nDONE <qname> <id>\n\t Mark item as done"
+          case "TOUCH" => "\nTOUCH <qname> <id> <additional_time_seconds>\n\tRequest additional processing time"
+          case "HELP" => "\nHELP [commands]\n\t Get info on the specified commands"
+        }
+      current + "\n"+ help(rest)
+        
+    }
   }
   private def done(opts: DoneOptions): Unit = {
     CallbackActor ! getQueue(opts.q).done(opts.id)
