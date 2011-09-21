@@ -1,3 +1,5 @@
+# Abandoned.
+
 SJQ: Simple job queue or if you think it isn't simple, Scala job queue
 
 Completely alpha.
